@@ -1,0 +1,112 @@
+  
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body > h1:nth-of-type(1) {
+      cursor: pointer;
+    }
+
+    body {
+      --title-bar-height: 42px;
+      padding-top: var(--title-bar-height);
+      background: #1e1f26;
+      color: #fff;
+      font-family: system-ui, sans-serif;
+    }
+
+    #bar {
+      background: rgba(55, 60, 72, 0.6);
+      backdrop-filter: blur(64px);
+      -webkit-app-region: drag;
+      height: var(--title-bar-height);
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      left: 0;
+      z-index: 2;
+      color: #fff;
+    }
+
+    #drop-zone {
+      margin: 24px auto;
+      width: 90%;
+      max-width: 600px;
+      height: 180px;
+      border: 2px dashed rgba(255, 255, 255, 0.3);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      color: #aaa;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(20px);
+      transition: border 0.2s, background 0.2s;
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+    }
+
+    #drop-zone:hover {
+      border-color: #66aaff;
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    #drop-zone.dragover {
+      border-color: #3399ff;
+      background: rgba(51, 153, 255, 0.15);
+      color: #fff;
+    }
+
+    #drop-zone input {
+      display: none;
+    }
+
+    #chooser {
+      position: absolute;
+      bottom: 12px;
+      display: flex;
+      gap: 12px;
+      font-size: 13px;
+      color: #66aaff;
+    }
+
+    #chooser button {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #fff;
+      transition: background 0.2s;
+    }
+
+    #chooser button:hover {
+      background: rgba(255,255,255,0.15);
+    }
+  </style>
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <div id="bar"><pear-ctrl></pear-ctrl></div>
+
+  <div id="drop-zone">
+    <input type="file" id="file-input" multiple />
+    <input type="file" id="dir-input" webkitdirectory />
+    <div>📂 Drag & Drop files or folders here</div>
+    <span>or use the chooser below</span>
+    <div id="chooser">
+      <button id="pick-files">Select Files</button>
+      <button id="pick-folder">Select Folder</button>
+    </div>
+  </div>
+
+  <h1>desktop</h1>
+</body>
+</html>

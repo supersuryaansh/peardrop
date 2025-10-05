@@ -1,0 +1,27 @@
+{
+  "name": "jusdrop",
+  "main": "index.html",
+  "pear": {
+    "name": "jusdrop",
+    "type": "desktop",
+    "gui": {
+      "backgroundColor": "#1F2430",
+      "height": "540",
+      "width": "720"
+    }
+  },
+  "type": "module",
+  "license": "Apache-2.0",
+  "scripts": {
+    "dev": "pear run -d .",
+    "test": "brittle test/*.test.js"
+  },
+  "devDependencies": {
+    "brittle": "^3.0.0",
+    "pear-interface": "^1.0.0"
+  },
+  "dependencies": {
+    "hyperbeam": "^3.1.0",
+    "tar-fs": "^3.1.1"
+  }
+}
