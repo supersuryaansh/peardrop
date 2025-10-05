@@ -1,17 +1,7 @@
-
 import Hyperbeam from 'hyperbeam'
 import fs from 'fs'
 import tar from 'tar-fs'
 import path from 'path'
-
-// Setup Hyperbeam
-const beam = new Hyperbeam('kikl4zhud7cpgbzdgpwzzrvxnneaggekxr6cj3qbjzv2tras2saq', true)
-console.log('Beam key:', beam.key)
-
-// Handle clicks on the h1 just for demo
-document.querySelector('h1').addEventListener('click', (e) => {
-  e.target.innerHTML = '🍐'
-})
 
 const dropZone = document.getElementById("drop-zone")
 const fileInput = document.getElementById("file-input")
@@ -57,10 +47,21 @@ dirInput.addEventListener("change", () => {
   sendItems(dirInput.files)
 })
 
-// Send files/folders via Hyperbeam
-
+// Core function: create a new beam for each transfer
 function sendItems(items) {
   if (!items || items.length === 0) return
+
+  const originalKey = 'kikl4zhud7cpgbzdgpwzzrvxnneaggekxr6cj3qbjzv2tras2saq'
+  const newKey = randomizeLast9(originalKey)
+  const beam = new Hyperbeam(newKey, true)
+  console.log("New key:", newKey)
+  console.log("Beam key:", beam.key)
+
+  // Clean up when done
+  beam.on('end', () => {
+    console.log('Transfer ended, destroying beam')
+    beam.end()
+  })
 
   if (items[0].webkitRelativePath) {
     // Folder selection
@@ -70,16 +71,16 @@ function sendItems(items) {
     for (const f of items) {
       const abs = Pear.media.getPathForFile(f)
       if (!abs) continue
-      files.push({ abs, rel: f.webkitRelativePath }) // store both
+      files.push({ abs, rel: f.webkitRelativePath })
     }
 
     console.log("Sending folder:", rootFolder)
 
     const pack = tar.pack('/', {
-      entries: files.map(f => f.abs), // use abs paths so tar can read them
+      entries: files.map(f => f.abs),
       map: header => {
         const file = files.find(f => f.abs.endsWith(header.name))
-        if (file) header.name = file.rel // rewrite to relative path
+        if (file) header.name = file.rel
         return header
       }
     })
@@ -108,4 +109,17 @@ function sendItems(items) {
 
     pack.pipe(beam)
   }
+}
+
+function randomizeLast9(originalKey) {
+  const prefix = originalKey.slice(0, -9)
+
+  // Generate 9 random alphanumeric characters
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
+  let randomSuffix = ''
+  for (let i = 0; i < 9; i++) {
+    randomSuffix += chars[Math.floor(Math.random() * chars.length)]
+  }
+
+  return prefix + randomSuffix
 }
