@@ -1,7 +1,11 @@
+
 import Hyperbeam from 'hyperbeam'
 import fs from 'fs'
 import tar from 'tar-fs'
 import path from 'path'
+import QRCode from 'qrcode' // npm install qrcode
+import { encode, decode } from 'hi-base32';
+import uuid from 'uuid-v4'
 
 const dropZone = document.getElementById("drop-zone")
 const fileInput = document.getElementById("file-input")
@@ -47,24 +51,25 @@ dirInput.addEventListener("change", () => {
   sendItems(dirInput.files)
 })
 
-// Core function: create a new beam for each transfer
+// --------------------
+// Core function
+// --------------------
 function sendItems(items) {
   if (!items || items.length === 0) return
 
-  const originalKey = 'kikl4zhud7cpgbzdgpwzzrvxnneaggekxr6cj3qbjzv2tras2saq'
-  const newKey = randomizeLast9(originalKey)
-  const beam = new Hyperbeam(newKey, true)
-  console.log("New key:", newKey)
-  console.log("Beam key:", beam.key)
+  const phrase = uuid().split('-').pop()
+  const key = encode(phrase, true).replace(/=/g, '')
+  const beam = new Hyperbeam(key, true)
+  console.log("Phrase:", beam.key)
+  showQrCode(phrase)
 
-  // Clean up when done
   beam.on('end', () => {
     console.log('Transfer ended, destroying beam')
     beam.end()
+    removeQrCode()
   })
 
   if (items[0].webkitRelativePath) {
-    // Folder selection
     const rootFolder = items[0].webkitRelativePath.split('/')[0]
     const files = []
 
@@ -88,7 +93,6 @@ function sendItems(items) {
     pack.pipe(beam)
 
   } else {
-    // Individual files
     const files = []
     for (const f of items) {
       const abs = Pear.media.getPathForFile(f)
@@ -111,15 +115,32 @@ function sendItems(items) {
   }
 }
 
-function randomizeLast9(originalKey) {
-  const prefix = originalKey.slice(0, -9)
+let qrModal = null
 
-  // Generate 9 random alphanumeric characters
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
-  let randomSuffix = ''
-  for (let i = 0; i < 9; i++) {
-    randomSuffix += chars[Math.floor(Math.random() * chars.length)]
+async function showQrCode(key) {
+  // Create modal overlay
+  qrModal = document.createElement('div')
+  qrModal.style.position = 'fixed'
+  qrModal.style.top = 0
+  qrModal.style.left = 0
+  qrModal.style.width = '100%'
+  qrModal.style.height = '100%'
+  qrModal.style.background = 'rgba(0,0,0,0.8)'
+  qrModal.style.display = 'flex'
+  qrModal.style.alignItems = 'center'
+  qrModal.style.justifyContent = 'center'
+  qrModal.style.zIndex = 9999
+
+  const canvas = document.createElement('canvas')
+  qrModal.appendChild(canvas)
+  document.body.appendChild(qrModal)
+
+  await QRCode.toCanvas(canvas, key, { width: 300 })
+}
+
+function removeQrCode() {
+  if (qrModal) {
+    qrModal.remove()
+    qrModal = null
   }
-
-  return prefix + randomSuffix
 }

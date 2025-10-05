@@ -21,8 +21,10 @@
     "pear-interface": "^1.0.0"
   },
   "dependencies": {
+    "hi-base32": "^0.5.1",
     "hyperbeam": "^3.1.0",
     "qrcode": "^1.5.4",
-    "tar-fs": "^3.1.1"
+    "tar-fs": "^3.1.1",
+    "uuid-v4": "^0.1.0"
   }
 }
