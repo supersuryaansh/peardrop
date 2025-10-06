@@ -1,12 +1,7 @@
-  
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
 <head>
   <style>
-    body > h1:nth-of-type(1) {
-      cursor: pointer;
-    }
-
     body {
       --title-bar-height: 42px;
       padding-top: var(--title-bar-height);
@@ -30,11 +25,39 @@
       color: #fff;
     }
 
+    /* Tabs */
+    #tabs {
+      display: flex;
+      margin: 20px auto;
+      width: max-content;
+      gap: 16px;
+    }
+    #tabs button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      font-weight: bold;
+    }
+    #tabs button.active {
+      background: #3399ff;
+    }
+
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Drop zone same as before */
     #drop-zone {
       margin: 24px auto;
       width: 90%;
       max-width: 600px;
-      height: 80vh;
+      height: 70vh;
       border: 2px dashed rgba(255, 255, 255, 0.3);
       border-radius: 16px;
       display: flex;
@@ -46,26 +69,9 @@
       font-size: 16px;
       background: rgba(255, 255, 255, 0.04);
       backdrop-filter: blur(20px);
-      transition: border 0.2s, background 0.2s;
       cursor: pointer;
       user-select: none;
       position: relative;
-    }
-
-    #drop-zone:hover {
-      border-color: #66aaff;
-      background: rgba(255, 255, 255, 0.08);
-      color: #fff;
-    }
-
-    #drop-zone.dragover {
-      border-color: #3399ff;
-      background: rgba(51, 153, 255, 0.15);
-      color: #fff;
-    }
-
-    #drop-zone input {
-      display: none;
     }
 
     #chooser {
@@ -84,11 +90,34 @@
       border-radius: 6px;
       cursor: pointer;
       color: #fff;
-      transition: background 0.2s;
     }
 
     #chooser button:hover {
       background: rgba(255,255,255,0.15);
+    }
+
+    /* Receive tab */
+    #receive-tab {
+      margin: 40px auto;
+      width: 400px;
+      text-align: center;
+    }
+    #phrase-input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+    #start-receive {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #3399ff;
+      color: #fff;
+      cursor: pointer;
+      font-weight: bold;
     }
   </style>
   <script type="module" src="./app.js"></script>
@@ -96,15 +125,29 @@
 <body>
   <div id="bar"><pear-ctrl></pear-ctrl></div>
 
-  <div id="drop-zone">
-    <input type="file" id="file-input" multiple />
-    <input type="file" id="dir-input" webkitdirectory />
-    <div>📂 Drag & Drop files or folders here</div>
-    <span>or use the chooser below</span>
-    <div id="chooser">
-      <button id="pick-files">Select Files</button>
-      <button id="pick-folder">Select Folder</button>
+  <div id="tabs">
+    <button id="send-tab-btn" class="active">Send</button>
+    <button id="receive-tab-btn">Receive</button>
+  </div>
+
+  <div id="send-tab" class="tab-content active">
+    <div id="drop-zone">
+      <input type="file" id="file-input" multiple hidden/>
+      <input type="file" id="dir-input" webkitdirectory hidden/>
+      <div>📂 Drag & Drop files or folders here</div>
+      <span>or use the chooser below</span>
+      <div id="chooser">
+        <button id="pick-files">Select Files</button>
+        <button id="pick-folder">Select Folder</button>
+      </div>
     </div>
+  </div>
+
+  <div id="receive-tab" class="tab-content">
+    <input id="phrase-input" placeholder="Enter phrase code" />
+    <button id="start-receive">Start Receiving</button>
+    <pre id="receive-log"></pre>
   </div>
 </body>
 </html>
+
