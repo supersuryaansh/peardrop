@@ -139,7 +139,7 @@ async function showQrCode(key, beam) {
   // Inner container
   const container = document.createElement('div')
   container.style.background = '#222'
-  container.style.padding = '24px'
+  container.style.padding = '40px'
   container.style.borderRadius = '12px'
   container.style.display = 'flex'
   container.style.flexDirection = 'column'
