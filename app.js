@@ -1,153 +1,92 @@
-import Hyperbeam from 'hyperbeam'
-import fs from 'fs'
-import tar from 'tar-fs'
-import path from 'path'
+import Peardrop from './lib/peardrop.js'
 import QRCode from 'qrcode'
-import { encode, decode } from 'hi-base32'
-import uuid from 'uuid-v4'
 
 // ------------------
 // Tab Switching
 // ------------------
-const sendTabBtn = document.getElementById("send-tab-btn")
-const receiveTabBtn = document.getElementById("receive-tab-btn")
-const sendTab = document.getElementById("send-tab")
-const receiveTab = document.getElementById("receive-tab")
+const sendTabBtn = document.getElementById('send-tab-btn')
+const receiveTabBtn = document.getElementById('receive-tab-btn')
+const sendTab = document.getElementById('send-tab')
+const receiveTab = document.getElementById('receive-tab')
 
-function switchTab(tab) {
-  if (tab === "send") {
-    sendTabBtn.classList.add("active")
-    receiveTabBtn.classList.remove("active")
-    sendTab.classList.add("active")
-    receiveTab.classList.remove("active")
+function switchTab (tab) {
+  if (tab === 'send') {
+    sendTabBtn.classList.add('active')
+    receiveTabBtn.classList.remove('active')
+    sendTab.classList.add('active')
+    receiveTab.classList.remove('active')
   } else {
-    receiveTabBtn.classList.add("active")
-    sendTabBtn.classList.remove("active")
-    receiveTab.classList.add("active")
-    sendTab.classList.remove("active")
+    receiveTabBtn.classList.add('active')
+    sendTabBtn.classList.remove('active')
+    receiveTab.classList.add('active')
+    sendTab.classList.remove('active')
   }
 }
-sendTabBtn.onclick = () => switchTab("send")
-receiveTabBtn.onclick = () => switchTab("receive")
+sendTabBtn.onclick = () => switchTab('send')
+receiveTabBtn.onclick = () => switchTab('receive')
 
 // ------------------
 // SEND LOGIC
 // ------------------
-const dropZone = document.getElementById("drop-zone")
-const fileInput = document.getElementById("file-input")
-const dirInput = document.getElementById("dir-input")
+const dropZone = document.getElementById('drop-zone')
+const fileInput = document.getElementById('file-input')
+const dirInput = document.getElementById('dir-input')
 
-function logFiles(fileList) {
+let qrModal = null
+let currentDrop = null
+
+function logFiles (fileList) {
   for (const file of fileList) {
     const rel = file.webkitRelativePath || file.name
-    console.log("→", rel)
+    console.log('→', rel)
   }
 }
 
-// Drag & drop events
-dropZone.addEventListener("dragover", (e) => {
+dropZone.addEventListener('dragover', (e) => {
   e.preventDefault()
-  dropZone.classList.add("dragover")
+  dropZone.classList.add('dragover')
 })
-dropZone.addEventListener("dragleave", () => {
-  dropZone.classList.remove("dragover")
-})
-dropZone.addEventListener("drop", (e) => {
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'))
+dropZone.addEventListener('drop', (e) => {
   e.preventDefault()
-  dropZone.classList.remove("dragover")
+  dropZone.classList.remove('dragover')
   const files = e.dataTransfer.files
-  console.log("Dropped items:")
+  console.log('Dropped items:')
   logFiles(files)
   sendItems(files)
 })
 
-// Buttons
-document.getElementById("pick-files").onclick = () => fileInput.click()
-document.getElementById("pick-folder").onclick = () => dirInput.click()
-fileInput.addEventListener("change", () => {
-  console.log("Selected files:", fileInput.files)
-  sendItems(fileInput.files)
-})
-dirInput.addEventListener("change", () => {
-  console.log("Selected folder:", dirInput.files)
-  sendItems(dirInput.files)
-})
+document.getElementById('pick-files').onclick = () => fileInput.click()
+document.getElementById('pick-folder').onclick = () => dirInput.click()
+fileInput.addEventListener('change', () => sendItems(fileInput.files))
+dirInput.addEventListener('change', () => sendItems(dirInput.files))
 
-// ------------------
-// Core send function
-// ------------------
-let qrModal = null
-let currentBeam = null
-
-function sendItems(items) {
+async function sendItems (items) {
   if (!items || items.length === 0) return
 
-  const phrase = uuid().split('-').pop()
-  const key = encode(phrase, true).replace(/=/g, '')
-  const beam = new Hyperbeam(key, true)
+  const drop = new Peardrop() // sender mode (no code passed)
+  currentDrop = drop
 
-  console.log("Phrase:", beam.key)
-  showQrCode(phrase, beam)
+  console.log('Generated phrase:', drop.code)
+  showQrCode(drop.code, drop)
 
-  beam.on('end', () => {
-    console.log('Transfer ended, destroying beam')
-    beam.end()
-    removeQrCode()
-  })
-  beam.on('error', (err) => {
-    console.error("Beam error:", err)
+  drop.beam.on('end', () => {
+    console.log('Transfer ended')
     removeQrCode()
   })
 
-  if (items[0].webkitRelativePath) {
-    // Folder selection
-    const rootFolder = items[0].webkitRelativePath.split('/')[0]
-    const files = []
-    for (const f of items) {
-      const abs = Pear.media.getPathForFile(f)
-      if (!abs) continue
-      files.push({ abs, rel: f.webkitRelativePath })
-    }
+  drop.beam.on('error', (err) => {
+    console.error('Beam error:', err)
+    removeQrCode()
+  })
 
-    console.log("Sending folder:", rootFolder)
-    const pack = tar.pack('/', {
-      entries: files.map(f => f.abs),
-      map: header => {
-        const file = files.find(f => f.abs.endsWith(header.name))
-        if (file) header.name = file.rel
-        return header
-      }
-    })
-    pack.pipe(beam)
-
-  } else {
-    // Individual files
-    const files = []
-    for (const f of items) {
-      const abs = Pear.media.getPathForFile(f)
-      if (!abs) continue
-      files.push({ abs, rel: path.basename(abs) })
-    }
-
-    console.log("Sending files:", files.map(f => f.rel))
-    const pack = tar.pack('/', {
-      entries: files.map(f => f.abs),
-      map: header => {
-        const file = files.find(f => f.abs.endsWith(header.name))
-        if (file) header.name = file.rel
-        return header
-      }
-    })
-    pack.pipe(beam)
-  }
+  drop.send(items)
 }
 
 // ------------------
 // QR Popup
 // ------------------
-async function showQrCode(key, beam) {
-  currentBeam = beam
-
+async function showQrCode (code, drop) {
   qrModal = document.createElement('div')
   qrModal.style.position = 'fixed'
   qrModal.style.top = 0
@@ -182,24 +121,21 @@ async function showQrCode(key, beam) {
   closeBtn.style.color = '#bbb'
   closeBtn.addEventListener('mouseover', () => (closeBtn.style.color = '#fff'))
   closeBtn.addEventListener('mouseout', () => (closeBtn.style.color = '#bbb'))
-  closeBtn.addEventListener('click', () => {
+  closeBtn.addEventListener('click', async () => {
     console.log('Transfer cancelled by user')
-    if (currentBeam) {
-      currentBeam.destroy()
-      currentBeam = null
-    }
+    if (drop) await drop.destroy()
     removeQrCode()
   })
   container.appendChild(closeBtn)
 
   // QR code
   const canvas = document.createElement('canvas')
-  await QRCode.toCanvas(canvas, key, { width: 300 })
+  await QRCode.toCanvas(canvas, code, { width: 300 })
   container.appendChild(canvas)
 
   // Phrase text
   const phraseText = document.createElement('div')
-  phraseText.innerText = key.toUpperCase()
+  phraseText.innerText = code
   phraseText.style.fontSize = '18px'
   phraseText.style.fontWeight = 'bold'
   phraseText.style.letterSpacing = '2px'
@@ -217,7 +153,7 @@ async function showQrCode(key, beam) {
   copyBtn.style.fontSize = '14px'
   copyBtn.style.fontWeight = 'bold'
   copyBtn.addEventListener('click', () => {
-    navigator.clipboard.writeText(key.toUpperCase())
+    navigator.clipboard.writeText(code)
     copyBtn.innerText = 'COPIED!'
     setTimeout(() => (copyBtn.innerText = 'COPY CODE'), 2000)
   })
@@ -227,56 +163,45 @@ async function showQrCode(key, beam) {
   document.body.appendChild(qrModal)
 }
 
-function removeQrCode() {
+function removeQrCode () {
   if (qrModal) {
     qrModal.remove()
     qrModal = null
   }
-  if (currentBeam) {
-    currentBeam.end()
-    currentBeam = null
+  if (currentDrop) {
+    currentDrop.destroy()
+    currentDrop = null
   }
 }
 
 // ------------------
 // RECEIVE LOGIC
 // ------------------
-const phraseInput = document.getElementById("phrase-input")
-const startReceiveBtn = document.getElementById("start-receive")
-const receiveLog = document.getElementById("receive-log")
+const phraseInput = document.getElementById('phrase-input')
+const startReceiveBtn = document.getElementById('start-receive')
+const receiveLog = document.getElementById('receive-log')
 
 startReceiveBtn.onclick = () => {
-  const phrase = phraseInput.value.trim().toLowerCase()
-  if (!phrase) return alert("Enter a phrase")
+  const phrase = phraseInput.value.trim().toUpperCase()
+  if (!phrase) return alert('Enter a phrase')
 
-  try {
-    const key = encode(phrase, true).replace(/=/g, '')
-    const beam = new Hyperbeam(key)
-    console.log(beam.key)
+  const drop = new Peardrop(phrase) // receiver mode (pass code)
+  currentDrop = drop
+  receiveLog.textContent += `\n[waiting] Connecting with phrase ${phrase} ...`
 
-    receiveLog.textContent += `\n[waiting] Connecting with phrase ${phrase} ...`
+  drop.event.on('progress', (msg) => {
+    receiveLog.textContent += `\n${msg}`
+  })
 
-    // Extract to Downloads folder
-    const downloads = path.join(process.env.HOME || process.env.USERPROFILE, 'Downloads')
-    if (!fs.existsSync(downloads)) fs.mkdirSync(downloads, { recursive: true })
+  drop.beam.on('data', (chunk) => {
+    receiveLog.textContent += `\n[received] ${chunk.length} bytes`
+  })
 
-    const extract = tar.extract(downloads)
-    beam.pipe(extract)
+  drop.beam.on('end', () => {
+    receiveLog.textContent += '\n[done] Transfer completed → saved in Downloads'
+  })
 
-    beam.on('data', (chunk) => {
-      receiveLog.textContent += `\n[received] ${chunk.length} bytes`
-    })
-
-    beam.on('end', () => {
-      receiveLog.textContent += `\n[done] Transfer completed → saved in Downloads`
-    })
-
-    beam.on('error', (err) => {
-      receiveLog.textContent += `\n[error] ${err.message}`
-    })
-  } catch (e) {
-    alert("Invalid phrase")
-    console.log(e)
-  }
+  drop.beam.on('error', (err) => {
+    receiveLog.textContent += `\n[error] ${err.message}`
+  })
 }
-
