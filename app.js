@@ -7,7 +7,7 @@ const receiveTabBtn = document.getElementById('receive-tab-btn')
 const sendTab = document.getElementById('send-tab')
 const receiveTab = document.getElementById('receive-tab')
 
-function switchTab(tab) {
+function switchTab (tab) {
   if (tab === 'send') {
     sendTabBtn.classList.add('active')
     receiveTabBtn.classList.remove('active')
@@ -30,11 +30,12 @@ const dirInput = document.getElementById('dir-input')
 const fileListEl = document.getElementById('file-list')
 const qrContainer = document.getElementById('qr-container')
 const sendBtn = document.getElementById('send-files')
+const chooser = document.getElementById('chooser')
 
 let selectedFiles = []
 let currentDrop = null
 
-function updateFileList() {
+function updateFileList () {
   fileListEl.innerHTML = ''
   selectedFiles.forEach((file, i) => {
     const item = document.createElement('div')
@@ -76,7 +77,7 @@ dirInput.addEventListener('change', () => {
 
 sendBtn.onclick = () => sendItems(selectedFiles)
 
-async function sendItems(items) {
+async function sendItems (items) {
   if (!items || items.length === 0) return
   const drop = new Peardrop()
   currentDrop = drop
@@ -106,8 +107,24 @@ async function sendItems(items) {
   cancelBtn.onclick = async () => {
     await drop.destroy()
     qrContainer.style.display = 'none'
+
+    // Select all button elements within the .file-item class
+    const buttons = document.querySelectorAll('.file-item button')
+
+    // Loop through each button and show it
+    buttons.forEach(button => {
+      button.style.display = 'inline' // or 'block' depending on your layout
+    })
   }
   qrContainer.appendChild(cancelBtn)
+  chooser.style.display = 'none'
+  // Select all button elements within the .file-item class
+  const buttons = document.querySelectorAll('.file-item button')
+
+  // Loop through each button and hide it
+  buttons.forEach(button => {
+    button.style.display = 'none'
+  })
 
   drop.on('end', () => {
     qrContainer.style.display = 'none'
@@ -145,4 +162,3 @@ startReceiveBtn.onclick = () => {
     receiveLog.textContent += `\n[error] ${err.message}`
   })
 }
-
