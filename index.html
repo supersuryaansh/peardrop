@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <style>
@@ -8,6 +8,7 @@
       background: #1e1f26;
       color: #fff;
       font-family: system-ui, sans-serif;
+      margin: 0;
     }
 
     #bar {
@@ -23,26 +24,32 @@
       left: 0;
       z-index: 2;
       color: #fff;
+      padding-left: 12px;
+      line-height: var(--title-bar-height);
+      font-size: 13px;
+      opacity: 0.8;
     }
 
-    /* Tabs */
     #tabs {
       display: flex;
       margin: 20px auto;
       width: max-content;
-      gap: 16px;
+      gap: 10px;
     }
+
     #tabs button {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 6px;
+      padding: 8px 18px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
       cursor: pointer;
-      background: rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.06);
       color: #fff;
-      font-weight: bold;
+      font-weight: 600;
+      transition: 0.2s ease;
     }
     #tabs button.active {
-      background: #3399ff;
+      background: #b6ff39;
+      color: #000;
     }
 
     .tab-content {
@@ -52,51 +59,136 @@
       display: block;
     }
 
-    /* Drop zone same as before */
+    /* DROP ZONE */
     #drop-zone {
       margin: 24px auto;
       width: 90%;
       max-width: 600px;
       height: 70vh;
-      border: 2px dashed rgba(255, 255, 255, 0.3);
+      border: 2px dashed rgba(255, 255, 255, 0.2);
       border-radius: 16px;
       display: flex;
-      align-items: center;
-      justify-content: center;
       flex-direction: column;
-      text-align: center;
+      align-items: center;
+      justify-content: flex-start;
       color: #aaa;
-      font-size: 16px;
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(255, 255, 255, 0.03);
       backdrop-filter: blur(20px);
-      cursor: pointer;
-      user-select: none;
       position: relative;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+
+    #drop-zone.dragover {
+      border-color: #b6ff39;
+      color: #b6ff39;
+    }
+
+    #drop-zone > div:first-child {
+      margin-top: 16px;
+      font-size: 16px;
+    }
+
+    #file-list {
+      margin-top: 20px;
+      width: 100%;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 8px;
+    }
+
+    /* Custom scrollbar */
+    #file-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    #file-list::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+    }
+    #file-list::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+    }
+
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.05);
+      padding: 8px 12px;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+    }
+    .file-item button {
+      background: none;
+      border: none;
+      color: #b6ff39;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    /* QR container inside drop zone */
+    #qr-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    #qr-container canvas {
+      background: #fff;
+      border-radius: 12px;
+      width: 160px;
+      height: 160px;
     }
 
     #chooser {
-      position: absolute;
-      bottom: 12px;
+      margin-top: 16px;
       display: flex;
       gap: 12px;
-      font-size: 13px;
-      color: #66aaff;
     }
 
     #chooser button {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      padding: 4px 10px;
-      border-radius: 6px;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
       cursor: pointer;
-      color: #fff;
+      font-weight: 600;
+      font-size: 14px;
+      transition: background 0.2s ease;
     }
 
-    #chooser button:hover {
+    #pick-files,
+    #pick-folder {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    #send-files {
+      background: #b6ff39;
+      color: #000;
+    }
+
+    #pick-files:hover,
+    #pick-folder:hover {
       background: rgba(255,255,255,0.15);
     }
 
-    /* Receive tab */
+    #send-files:hover {
+      background: #c6ff5a;
+    }
+
+    /* RECEIVE TAB */
     #receive-tab {
       margin: 40px auto;
       width: 400px;
@@ -114,8 +206,8 @@
       padding: 8px 16px;
       border: none;
       border-radius: 6px;
-      background: #3399ff;
-      color: #fff;
+      background: #b6ff39;
+      color: #000;
       cursor: pointer;
       font-weight: bold;
     }
@@ -123,22 +215,26 @@
   <script type="module" src="./app.js"></script>
 </head>
 <body>
-  <div id="bar"><pear-ctrl></pear-ctrl></div>
+  <div id="bar">MacBook Air - 5</div>
 
   <div id="tabs">
-    <button id="send-tab-btn" class="active">Send</button>
     <button id="receive-tab-btn">Receive</button>
+    <button id="send-tab-btn" class="active">Send</button>
   </div>
 
   <div id="send-tab" class="tab-content active">
     <div id="drop-zone">
       <input type="file" id="file-input" multiple hidden/>
       <input type="file" id="dir-input" webkitdirectory hidden/>
-      <div>📂 Drag & Drop files or folders here</div>
-      <span>or use the chooser below</span>
+      <div>Drop the file here or browse through your folders</div>
+
+      <div id="file-list"></div>
+      <div id="qr-container"></div>
+
       <div id="chooser">
         <button id="pick-files">Select Files</button>
-        <button id="pick-folder">Select Folder</button>
+        <button id="pick-folder">Browse Folder</button>
+        <button id="send-files">Send</button>
       </div>
     </div>
   </div>
