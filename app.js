@@ -1,3 +1,4 @@
+
 import Peardrop from './lib/peardrop.js'
 import QRCode from 'qrcode'
 
@@ -70,12 +71,13 @@ async function sendItems (items) {
   console.log('Generated phrase:', drop.code)
   showQrCode(drop.code, drop)
 
-  drop.beam.on('end', () => {
+  // use Peardrop’s event emitters instead of beam directly
+  drop.on('end', () => {
     console.log('Transfer ended')
     removeQrCode()
   })
 
-  drop.beam.on('error', (err) => {
+  drop.on('error', (err) => {
     console.error('Beam error:', err)
     removeQrCode()
   })
@@ -189,19 +191,17 @@ startReceiveBtn.onclick = () => {
   currentDrop = drop
   receiveLog.textContent += `\n[waiting] Connecting with phrase ${phrase} ...`
 
-  drop.event.on('progress', (msg) => {
-    receiveLog.textContent += `\n${msg}`
-  })
-
-  drop.beam.on('data', (chunk) => {
+  // listen to peardrop’s emitted events
+  drop.on('data', (chunk) => {
     receiveLog.textContent += `\n[received] ${chunk.length} bytes`
   })
 
-  drop.beam.on('end', () => {
+  drop.on('end', () => {
     receiveLog.textContent += '\n[done] Transfer completed → saved in Downloads'
+    drop.destroy()
   })
 
-  drop.beam.on('error', (err) => {
+  drop.on('error', (err) => {
     receiveLog.textContent += `\n[error] ${err.message}`
   })
 }
