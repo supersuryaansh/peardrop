@@ -1,5 +1,6 @@
 import Peardrop from './lib/peardrop.js'
 import QRCode from 'qrcode'
+import os from 'os'
 
 // ------------------
 // Tab Switching
@@ -201,3 +202,7 @@ startReceiveBtn.onclick = async () => {
   })
 }
 
+// ------------------
+// General app logic
+// ------------------
+document.getElementById('bar').textContent = os.hostname()
