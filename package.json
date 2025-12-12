@@ -1,9 +1,9 @@
 {
-  "name": "jusdrop",
-  "main": "index.html",
+  "name": "peardrop",
   "pear": {
-    "name": "jusdrop",
+    "name": "peardrop",
     "type": "desktop",
+    "pre": "pear-electron/pre",
     "gui": {
       "backgroundColor": "#1F2430",
       "height": "673",
@@ -23,6 +23,8 @@
   "dependencies": {
     "hi-base32": "^0.5.1",
     "hyperbeam": "^3.1.0",
+    "pear-bridge": "^1.2.4",
+    "pear-electron": "^1.7.25",
     "qrcode": "^1.5.4",
     "tar-fs": "^3.1.1",
     "uuid-v4": "^0.1.0"
