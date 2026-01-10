@@ -145,6 +145,7 @@ async function sendItems (items) {
 const phraseInput = document.getElementById('phrase-input')
 const startReceiveBtn = document.getElementById('start-receive')
 const receiveLog = document.getElementById('receive-log')
+const clearSessionBtn = document.querySelector('.clear-btn')
 
 // Hidden folder picker for choosing download location
 const folderPicker = document.createElement('input')
@@ -201,6 +202,26 @@ startReceiveBtn.onclick = async () => {
     receiveLog.textContent += `\n[error] ${err.message}`
   })
 }
+
+clearSessionBtn.onclick = async () => {
+  const ok = confirm('Clear receive session and logs?')
+  if (!ok) return
+
+  // Only destroy if this is a receive session
+  if (currentDrop) {
+    try {
+      await currentDrop.destroy()
+    } catch (err) {
+      console.warn('Failed to destroy receive session:', err)
+    }
+    currentDrop = null
+  }
+
+  // Clear receive UI only
+  phraseInput.value = ''
+  receiveLog.textContent = ''
+}
+
 
 // ------------------
 // General app logic
