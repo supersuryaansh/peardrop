@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <style>
     body {
       --title-bar-height: 42px;
@@ -211,6 +212,50 @@
       cursor: pointer;
       font-weight: bold;
     }
+
+    /* RECEIVE INPUT WITH ICON BUTTONS */
+    .phrase-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    #phrase-input {
+      flex: 1;
+    }
+
+    /* Icon buttons */
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s ease, border 0.2s ease;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.25);
+    }
+
+    /* Subtle accent differentiation */
+    .clear-btn {
+      color: #ff6b6b;
+    }
+
+    .folder-btn {
+      color: #b6ff39;
+    }
+
   </style>
   <script type="module" src="./app.js"></script>
 </head>
@@ -240,10 +285,23 @@
   </div>
 
   <div id="receive-tab" class="tab-content">
-    <input id="phrase-input" placeholder="Enter phrase code" />
+    <div class="phrase-row">
+      <input id="phrase-input" placeholder="Enter phrase code" />
+
+      <button class="icon-btn clear-btn" title="Clear session">
+        ✕
+      </button>
+
+      <button class="icon-btn folder-btn" title="Select folder">
+        📁
+      </button>
+    </div>
+
     <button id="start-receive">Start Receiving</button>
     <pre id="receive-log"></pre>
   </div>
+
+
 </body>
 </html>
 
