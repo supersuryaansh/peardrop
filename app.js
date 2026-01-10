@@ -146,7 +146,17 @@ const phraseInput = document.getElementById('phrase-input')
 const startReceiveBtn = document.getElementById('start-receive')
 const receiveLog = document.getElementById('receive-log')
 const clearSessionBtn = document.querySelector('.clear-btn')
+const folderBtn = document.querySelector('.folder-btn')
+const pathModal = document.getElementById('path-modal')
+const pathInput = document.getElementById('path-input')
+const pathSave = document.getElementById('path-save')
+const pathCancel = document.getElementById('path-cancel')
+
+let selectedDownloadPath = null
+
+
 clearSessionBtn.disabled = true
+
 
 // Hidden folder picker for choosing download location
 const folderPicker = document.createElement('input')
@@ -155,37 +165,51 @@ folderPicker.webkitdirectory = true
 folderPicker.hidden = true
 document.body.appendChild(folderPicker)
 
+folderBtn.onclick = () => {
+  pathInput.value = selectedDownloadPath || ''
+  pathModal.classList.remove('hidden')
+  pathInput.focus()
+}
+
+pathCancel.onclick = () => {
+  pathModal.classList.add('hidden')
+}
+
+pathSave.onclick = () => {
+  const path = pathInput.value.trim()
+  if (!path) return
+
+  // very light absolute-path check
+  const isUnix = path.startsWith('/')
+  const isWindows = /^[A-Za-z]:\\/.test(path)
+
+  if (!isUnix && !isWindows) {
+    receiveLog.textContent += '\n[error] Invalid absolute path'
+    return
+  }
+
+  selectedDownloadPath = path
+  receiveLog.textContent += `\n[info] Download folder set to ${path}`
+
+  pathModal.classList.add('hidden')
+}
+
+
+
 startReceiveBtn.onclick = async () => {
   const phrase = phraseInput.value.trim().toUpperCase()
   if (!phrase) return alert('Enter a phrase')
-
-  // Ask user whether to choose a custom download folder
-  const choose = confirm('Would you like to choose a custom download folder?')
-  let downloadPath = null
-
-  if (choose) {
-    const folderPromise = new Promise((resolve) => {
-      folderPicker.onchange = (e) => {
-        const firstFile = e.target.files[0]
-        if (firstFile) {
-          // Derive the folder path from first file's webkitRelativePath
-          const fakePath = firstFile.webkitRelativePath.split('/')[0]
-          resolve(fakePath)
-        } else resolve(null)
-      }
-    })
-    folderPicker.click()
-    downloadPath = await folderPromise
-  }
 
   const drop = new Peardrop(phrase)
   currentDrop = drop
   clearSessionBtn.disabled = false
 
-  if (downloadPath) {
-    drop.setDownloadLocation(downloadPath)
-    receiveLog.textContent += `\n[info] Saving files to ${downloadPath}`
+  if (selectedDownloadPath) {
+    drop.setDownloadLocation(selectedDownloadPath)
+    drop.startReceive()
+    receiveLog.textContent += `\n[info] Saving files to ${selectedDownloadPath}`
   } else {
+    drop.startReceive()
     receiveLog.textContent += `\n[info] Saving files to default Downloads folder`
   }
 
@@ -198,13 +222,14 @@ startReceiveBtn.onclick = async () => {
   drop.on('end', () => {
     receiveLog.textContent += '\n[done] Transfer completed'
     drop.destroy()
-    clearSessionBtn.disabled = true
+    clearSessionBtn.disabled = false
   })
 
   drop.on('error', (err) => {
     receiveLog.textContent += `\n[error] ${err.message}`
   })
 }
+
 
 clearSessionBtn.onclick = async () => {
   const ok = confirm('Clear receive session and logs?')
@@ -223,6 +248,7 @@ clearSessionBtn.onclick = async () => {
   // Clear receive UI only
   phraseInput.value = ''
   receiveLog.textContent = ''
+  selectedDownloadPath = null
   clearSessionBtn.disabled = true
 }
 

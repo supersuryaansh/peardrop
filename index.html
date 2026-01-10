@@ -261,6 +261,72 @@
       cursor: not-allowed;
     }
 
+    /* MODAL */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .modal.hidden {
+      display: none;
+    }
+
+    .modal-card {
+      width: 420px;
+      background: rgba(30,31,38,0.95);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .modal-card h3 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .modal-card input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      font-size: 14px;
+    }
+
+    .modal-actions {
+      margin-top: 16px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .modal-actions button {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    #path-cancel {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+    }
+
+    #path-save {
+      background: #b6ff39;
+      color: #000;
+    }
+
   </style>
   <script type="module" src="./app.js"></script>
 </head>
@@ -306,6 +372,21 @@
     <pre id="receive-log"></pre>
   </div>
 
+  <div id="path-modal" class="modal hidden">
+    <div class="modal-card">
+      <h3>Select download folder</h3>
+
+      <input
+              id="path-input"
+              placeholder="/absolute/path/to/folder or C:\Path\To\Folder"
+      />
+
+      <div class="modal-actions">
+        <button id="path-cancel">Cancel</button>
+        <button id="path-save">Save</button>
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>
