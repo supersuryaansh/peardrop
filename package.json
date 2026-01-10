@@ -1,5 +1,6 @@
 {
   "name": "peardrop",
+  "version": "1.0.0",
   "pear": {
     "name": "peardrop",
     "type": "desktop",
