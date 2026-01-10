@@ -146,6 +146,7 @@ const phraseInput = document.getElementById('phrase-input')
 const startReceiveBtn = document.getElementById('start-receive')
 const receiveLog = document.getElementById('receive-log')
 const clearSessionBtn = document.querySelector('.clear-btn')
+clearSessionBtn.disabled = true
 
 // Hidden folder picker for choosing download location
 const folderPicker = document.createElement('input')
@@ -179,6 +180,7 @@ startReceiveBtn.onclick = async () => {
 
   const drop = new Peardrop(phrase)
   currentDrop = drop
+  clearSessionBtn.disabled = false
 
   if (downloadPath) {
     drop.setDownloadLocation(downloadPath)
@@ -196,6 +198,7 @@ startReceiveBtn.onclick = async () => {
   drop.on('end', () => {
     receiveLog.textContent += '\n[done] Transfer completed'
     drop.destroy()
+    clearSessionBtn.disabled = true
   })
 
   drop.on('error', (err) => {
@@ -220,6 +223,7 @@ clearSessionBtn.onclick = async () => {
   // Clear receive UI only
   phraseInput.value = ''
   receiveLog.textContent = ''
+  clearSessionBtn.disabled = true
 }
 
 
