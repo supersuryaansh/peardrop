@@ -14,11 +14,13 @@
   "license": "Apache-2.0",
   "scripts": {
     "dev": "pear run -d .",
-    "test": "brittle test/*.test.js"
+    "format": "npx prettier . --write"
   },
   "devDependencies": {
     "brittle": "^3.0.0",
-    "pear-interface": "^1.0.0"
+    "pear-interface": "^1.0.0",
+    "prettier": "^3.7.4",
+    "prettier-config-holepunch": "^2.0.0"
   },
   "dependencies": {
     "hi-base32": "^0.5.1",

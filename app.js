@@ -10,7 +10,7 @@ const receiveTabBtn = document.getElementById('receive-tab-btn')
 const sendTab = document.getElementById('send-tab')
 const receiveTab = document.getElementById('receive-tab')
 
-function switchTab (tab) {
+function switchTab(tab) {
   if (tab === 'send') {
     sendTabBtn.classList.add('active')
     receiveTabBtn.classList.remove('active')
@@ -40,7 +40,7 @@ const chooser = document.getElementById('chooser')
 let selectedFiles = []
 let currentDrop = null
 
-function updateFileList () {
+function updateFileList() {
   fileListEl.innerHTML = ''
   selectedFiles.forEach((file, i) => {
     const item = document.createElement('div')
@@ -83,7 +83,7 @@ dirInput.addEventListener('change', () => {
 
 sendBtn.onclick = () => sendItems(selectedFiles)
 
-async function sendItems (items) {
+async function sendItems(items) {
   if (!items || items.length === 0) return
   const drop = new Peardrop()
   currentDrop = drop
@@ -114,14 +114,18 @@ async function sendItems (items) {
     await drop.destroy()
     qrContainer.style.display = 'none'
     const buttons = document.querySelectorAll('.file-item button')
-    buttons.forEach(button => { button.style.display = 'inline' })
+    buttons.forEach((button) => {
+      button.style.display = 'inline'
+    })
     chooser.style.display = 'flex'
   }
   qrContainer.appendChild(cancelBtn)
 
   chooser.style.display = 'none'
   const buttons = document.querySelectorAll('.file-item button')
-  buttons.forEach(button => { button.style.display = 'none' })
+  buttons.forEach((button) => {
+    button.style.display = 'none'
+  })
 
   drop.on('end', () => {
     qrContainer.style.display = 'none'
@@ -154,9 +158,7 @@ const pathCancel = document.getElementById('path-cancel')
 
 let selectedDownloadPath = null
 
-
 clearSessionBtn.disabled = true
-
 
 // Hidden folder picker for choosing download location
 const folderPicker = document.createElement('input')
@@ -194,8 +196,6 @@ pathSave.onclick = () => {
   pathModal.classList.add('hidden')
 }
 
-
-
 startReceiveBtn.onclick = async () => {
   const phrase = phraseInput.value.trim().toUpperCase()
   if (!phrase) return alert('Enter a phrase')
@@ -230,7 +230,6 @@ startReceiveBtn.onclick = async () => {
   })
 }
 
-
 clearSessionBtn.onclick = async () => {
   const ok = confirm('Clear receive session and logs?')
   if (!ok) return
@@ -251,7 +250,6 @@ clearSessionBtn.onclick = async () => {
   selectedDownloadPath = null
   clearSessionBtn.disabled = true
 }
-
 
 // ------------------
 // General app logic

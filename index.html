@@ -1,393 +1,385 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <style>
-    body {
-      --title-bar-height: 42px;
-      padding-top: var(--title-bar-height);
-      background: #1e1f26;
-      color: #fff;
-      font-family: system-ui, sans-serif;
-      margin: 0;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      body {
+        --title-bar-height: 42px;
+        padding-top: var(--title-bar-height);
+        background: #1e1f26;
+        color: #fff;
+        font-family: system-ui, sans-serif;
+        margin: 0;
+      }
 
-    #bar {
-      background: rgba(55, 60, 72, 0.6);
-      backdrop-filter: blur(64px);
-      -webkit-app-region: drag;
-      height: var(--title-bar-height);
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
-      position: fixed;
-      width: 100%;
-      top: 0;
-      left: 0;
-      z-index: 2;
-      color: #fff;
-      padding-left: 12px;
-      line-height: var(--title-bar-height);
-      font-size: 13px;
-      opacity: 0.8;
-    }
+      #bar {
+        background: rgba(55, 60, 72, 0.6);
+        backdrop-filter: blur(64px);
+        -webkit-app-region: drag;
+        height: var(--title-bar-height);
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        left: 0;
+        z-index: 2;
+        color: #fff;
+        padding-left: 12px;
+        line-height: var(--title-bar-height);
+        font-size: 13px;
+        opacity: 0.8;
+      }
 
-    #tabs {
-      display: flex;
-      margin: 20px auto;
-      width: max-content;
-      gap: 10px;
-    }
+      #tabs {
+        display: flex;
+        margin: 20px auto;
+        width: max-content;
+        gap: 10px;
+      }
 
-    #tabs button {
-      padding: 8px 18px;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px;
-      cursor: pointer;
-      background: rgba(255,255,255,0.06);
-      color: #fff;
-      font-weight: 600;
-      transition: 0.2s ease;
-    }
-    #tabs button.active {
-      background: #b6ff39;
-      color: #000;
-    }
+      #tabs button {
+        padding: 8px 18px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.06);
+        color: #fff;
+        font-weight: 600;
+        transition: 0.2s ease;
+      }
+      #tabs button.active {
+        background: #b6ff39;
+        color: #000;
+      }
 
-    .tab-content {
-      display: none;
-    }
-    .tab-content.active {
-      display: block;
-    }
+      .tab-content {
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+      }
 
-    /* DROP ZONE */
-    #drop-zone {
-      margin: 24px auto;
-      width: 90%;
-      max-width: 600px;
-      height: 70vh;
-      border: 2px dashed rgba(255, 255, 255, 0.2);
-      border-radius: 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      color: #aaa;
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(20px);
-      position: relative;
-      padding: 24px;
-      box-sizing: border-box;
-    }
+      /* DROP ZONE */
+      #drop-zone {
+        margin: 24px auto;
+        width: 90%;
+        max-width: 600px;
+        height: 70vh;
+        border: 2px dashed rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        color: #aaa;
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(20px);
+        position: relative;
+        padding: 24px;
+        box-sizing: border-box;
+      }
 
-    #drop-zone.dragover {
-      border-color: #b6ff39;
-      color: #b6ff39;
-    }
+      #drop-zone.dragover {
+        border-color: #b6ff39;
+        color: #b6ff39;
+      }
 
-    #drop-zone > div:first-child {
-      margin-top: 16px;
-      font-size: 16px;
-    }
+      #drop-zone > div:first-child {
+        margin-top: 16px;
+        font-size: 16px;
+      }
 
-    #file-list {
-      margin-top: 20px;
-      width: 100%;
-      flex: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding-right: 8px;
-    }
+      #file-list {
+        margin-top: 20px;
+        width: 100%;
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-right: 8px;
+      }
 
-    /* Custom scrollbar */
-    #file-list::-webkit-scrollbar {
-      width: 6px;
-    }
-    #file-list::-webkit-scrollbar-track {
-      background: rgba(255,255,255,0.05);
-      border-radius: 10px;
-    }
-    #file-list::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.15);
-      border-radius: 10px;
-    }
+      /* Custom scrollbar */
+      #file-list::-webkit-scrollbar {
+        width: 6px;
+      }
+      #file-list::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+      }
+      #file-list::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+      }
 
-    .file-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(255,255,255,0.05);
-      padding: 8px 12px;
-      border-radius: 8px;
-      color: #fff;
-      font-size: 14px;
-    }
-    .file-item button {
-      background: none;
-      border: none;
-      color: #b6ff39;
-      cursor: pointer;
-      font-size: 16px;
-      line-height: 1;
-    }
+      .file-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 8px 12px;
+        border-radius: 8px;
+        color: #fff;
+        font-size: 14px;
+      }
+      .file-item button {
+        background: none;
+        border: none;
+        color: #b6ff39;
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+      }
 
-    /* QR container inside drop zone */
-    #qr-container {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      margin-top: 20px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 12px;
-      padding: 16px;
-    }
+      /* QR container inside drop zone */
+      #qr-container {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        margin-top: 20px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 16px;
+      }
 
-    #qr-container canvas {
-      background: #fff;
-      border-radius: 12px;
-      width: 160px;
-      height: 160px;
-    }
+      #qr-container canvas {
+        background: #fff;
+        border-radius: 12px;
+        width: 160px;
+        height: 160px;
+      }
 
-    #chooser {
-      margin-top: 16px;
-      display: flex;
-      gap: 12px;
-    }
+      #chooser {
+        margin-top: 16px;
+        display: flex;
+        gap: 12px;
+      }
 
-    #chooser button {
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 14px;
-      transition: background 0.2s ease;
-    }
+      #chooser button {
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        transition: background 0.2s ease;
+      }
 
-    #pick-files,
-    #pick-folder {
-      background: rgba(255,255,255,0.08);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
+      #pick-files,
+      #pick-folder {
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
 
-    #send-files {
-      background: #b6ff39;
-      color: #000;
-    }
+      #send-files {
+        background: #b6ff39;
+        color: #000;
+      }
 
-    #pick-files:hover,
-    #pick-folder:hover {
-      background: rgba(255,255,255,0.15);
-    }
+      #pick-files:hover,
+      #pick-folder:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
 
-    #send-files:hover {
-      background: #c6ff5a;
-    }
+      #send-files:hover {
+        background: #c6ff5a;
+      }
 
-    /* RECEIVE TAB */
-    #receive-tab {
-      margin: 40px auto;
-      width: 400px;
-      text-align: center;
-    }
-    #phrase-input {
-      width: 100%;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-      margin-bottom: 12px;
-      font-size: 16px;
-    }
-    #start-receive {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 6px;
-      background: #b6ff39;
-      color: #000;
-      cursor: pointer;
-      font-weight: bold;
-    }
+      /* RECEIVE TAB */
+      #receive-tab {
+        margin: 40px auto;
+        width: 400px;
+        text-align: center;
+      }
+      #phrase-input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 6px;
+        border: none;
+        margin-bottom: 12px;
+        font-size: 16px;
+      }
+      #start-receive {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        background: #b6ff39;
+        color: #000;
+        cursor: pointer;
+        font-weight: bold;
+      }
 
-    /* RECEIVE INPUT WITH ICON BUTTONS */
-    .phrase-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
+      /* RECEIVE INPUT WITH ICON BUTTONS */
+      .phrase-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
 
-    #phrase-input {
-      flex: 1;
-    }
+      #phrase-input {
+        flex: 1;
+      }
 
-    /* Icon buttons */
-    .icon-btn {
-      width: 38px;
-      height: 38px;
-      border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.06);
-      color: #fff;
-      cursor: pointer;
-      font-size: 16px;
-      line-height: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s ease, border 0.2s ease;
-    }
+      /* Icon buttons */
+      .icon-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.06);
+        color: #fff;
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          background 0.2s ease,
+          border 0.2s ease;
+      }
 
-    .icon-btn:hover {
-      background: rgba(255,255,255,0.15);
-      border-color: rgba(255,255,255,0.25);
-    }
+      .icon-btn:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.25);
+      }
 
-    /* Subtle accent differentiation */
-    .clear-btn {
-      color: #ff6b6b;
-    }
+      /* Subtle accent differentiation */
+      .clear-btn {
+        color: #ff6b6b;
+      }
 
-    .folder-btn {
-      color: #b6ff39;
-    }
+      .folder-btn {
+        color: #b6ff39;
+      }
 
-    .icon-btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
+      .icon-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
 
-    /* MODAL */
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.55);
-      backdrop-filter: blur(10px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-    }
+      /* MODAL */
+      .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+      }
 
-    .modal.hidden {
-      display: none;
-    }
+      .modal.hidden {
+        display: none;
+      }
 
-    .modal-card {
-      width: 420px;
-      background: rgba(30,31,38,0.95);
-      border-radius: 14px;
-      padding: 20px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-      border: 1px solid rgba(255,255,255,0.1);
-    }
+      .modal-card {
+        width: 420px;
+        background: rgba(30, 31, 38, 0.95);
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
 
-    .modal-card h3 {
-      margin: 0 0 12px;
-      font-size: 16px;
-      font-weight: 600;
-    }
+      .modal-card h3 {
+        margin: 0 0 12px;
+        font-size: 16px;
+        font-weight: 600;
+      }
 
-    .modal-card input {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.15);
-      background: rgba(255,255,255,0.06);
-      color: #fff;
-      font-size: 14px;
-    }
+      .modal-card input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.06);
+        color: #fff;
+        font-size: 14px;
+      }
 
-    .modal-actions {
-      margin-top: 16px;
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-    }
+      .modal-actions {
+        margin-top: 16px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
 
-    .modal-actions button {
-      padding: 8px 14px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-    }
+      .modal-actions button {
+        padding: 8px 14px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+      }
 
-    #path-cancel {
-      background: rgba(255,255,255,0.08);
-      color: #fff;
-    }
+      #path-cancel {
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+      }
 
-    #path-save {
-      background: #b6ff39;
-      color: #000;
-    }
+      #path-save {
+        background: #b6ff39;
+        color: #000;
+      }
+    </style>
+    <script type="module" src="./app.js"></script>
+  </head>
+  <body>
+    <div id="bar">Hostname</div>
 
-  </style>
-  <script type="module" src="./app.js"></script>
-</head>
-<body>
-  <div id="bar">Hostname</div>
+    <div id="tabs">
+      <button id="receive-tab-btn">Receive</button>
+      <button id="send-tab-btn" class="active">Send</button>
+    </div>
 
-  <div id="tabs">
-    <button id="receive-tab-btn">Receive</button>
-    <button id="send-tab-btn" class="active">Send</button>
-  </div>
+    <div id="send-tab" class="tab-content active">
+      <div id="drop-zone">
+        <input type="file" id="file-input" multiple hidden />
+        <input type="file" id="dir-input" webkitdirectory hidden />
+        <div>Drop the file here or browse through your folders</div>
 
-  <div id="send-tab" class="tab-content active">
-    <div id="drop-zone">
-      <input type="file" id="file-input" multiple hidden/>
-      <input type="file" id="dir-input" webkitdirectory hidden/>
-      <div>Drop the file here or browse through your folders</div>
+        <div id="file-list"></div>
+        <div id="qr-container"></div>
 
-      <div id="file-list"></div>
-      <div id="qr-container"></div>
-
-      <div id="chooser">
-        <button id="pick-files">Select Files</button>
-        <button id="pick-folder">Browse Folder</button>
-        <button id="send-files">Send</button>
+        <div id="chooser">
+          <button id="pick-files">Select Files</button>
+          <button id="pick-folder">Browse Folder</button>
+          <button id="send-files">Send</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div id="receive-tab" class="tab-content">
-    <div class="phrase-row">
-      <input id="phrase-input" placeholder="Enter Peardrop Code" />
+    <div id="receive-tab" class="tab-content">
+      <div class="phrase-row">
+        <input id="phrase-input" placeholder="Enter Peardrop Code" />
 
-      <button class="icon-btn clear-btn" title="Clear session">
-        ✕
-      </button>
+        <button class="icon-btn clear-btn" title="Clear session">✕</button>
 
-      <button class="icon-btn folder-btn" title="Select folder">
-        📁
-      </button>
+        <button class="icon-btn folder-btn" title="Select folder">📁</button>
+      </div>
+
+      <button id="start-receive">Start Receiving</button>
+      <pre id="receive-log"></pre>
     </div>
 
-    <button id="start-receive">Start Receiving</button>
-    <pre id="receive-log"></pre>
-  </div>
+    <div id="path-modal" class="modal hidden">
+      <div class="modal-card">
+        <h3>Select download folder</h3>
 
-  <div id="path-modal" class="modal hidden">
-    <div class="modal-card">
-      <h3>Select download folder</h3>
+        <input id="path-input" placeholder="/absolute/path/to/folder or C:\Path\To\Folder" />
 
-      <input
-              id="path-input"
-              placeholder="/absolute/path/to/folder or C:\Path\To\Folder"
-      />
-
-      <div class="modal-actions">
-        <button id="path-cancel">Cancel</button>
-        <button id="path-save">Save</button>
+        <div class="modal-actions">
+          <button id="path-cancel">Cancel</button>
+          <button id="path-save">Save</button>
+        </div>
       </div>
     </div>
-  </div>
-
-</body>
+  </body>
 </html>
-
