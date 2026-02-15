@@ -1,6 +1,8 @@
 import Peardrop from './lib/peardrop.js'
 import QRCode from 'qrcode'
 import os from 'os'
+import path from 'path'
+import ui from 'pear-electron'
 
 // ------------------
 // Tab Switching
@@ -140,7 +142,22 @@ async function sendItems(items) {
     chooser.style.display = 'flex'
   })
 
-  drop.send(items)
+  let rootFolder
+  if (items[0].webkitRelativePath) {
+    rootFolder = items[0].webkitRelativePath.split('/')[0]
+  }
+  const files = []
+  for (const f of items) {
+    const abs = ui.media.getPathForFile(f)
+    if (!abs) continue
+    if (rootFolder) {
+      files.push({ path: abs, name: f.webkitRelativePath })
+    } else {
+      files.push({ path: abs, name: path.basename(abs) })
+    }
+  }
+
+  drop.send(files)
 }
 
 // ------------------
