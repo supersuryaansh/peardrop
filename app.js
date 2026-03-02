@@ -1,4 +1,4 @@
-import Peardrop from './lib/peardrop.js'
+import Filebeam from 'filebeam'
 import QRCode from 'qrcode'
 import os from 'os'
 import path from 'path'
@@ -87,7 +87,7 @@ sendBtn.onclick = () => sendItems(selectedFiles)
 
 async function sendItems(items) {
   if (!items || items.length === 0) return
-  const drop = new Peardrop()
+  const drop = new Filebeam()
   currentDrop = drop
 
   qrContainer.style.display = 'flex'
@@ -217,7 +217,7 @@ startReceiveBtn.onclick = async () => {
   const phrase = phraseInput.value.trim().toUpperCase()
   if (!phrase) return alert('Enter a phrase')
 
-  const drop = new Peardrop(phrase)
+  const drop = new Filebeam(phrase)
   currentDrop = drop
   clearSessionBtn.disabled = false
 
